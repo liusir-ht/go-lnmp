@@ -56,27 +56,36 @@ func DownLoadPkg()  {
 		_=c4.Run()
 	}
 	start:=time.Now()
-	ctx,cancel:=context.WithTimeout(context.Background(),time.Minute * 5 )   //定一个 context超时控制
+	fmt.Printf("开始时间 ： %v\n",start)
+	ctx,cancel:=context.WithDeadline(context.Background(),start.Add(time.Minute*5) )   //定一个 context超时控制
 	defer cancel()
 	c2:=exec.CommandContext(ctx,"git","clone", GithubAddress) //克隆 GitHub 到本地
 	c2.Dir=Workdir
-	out01,err01:=c2.CombinedOutput()
-	if err01 != nil {
-		fmt.Printf("git  clone err:%v\n",err01)
-		fmt.Printf("git clone  err:%v\n",string(out01))
-		stop:=time.Since(start)
-		fmt.Printf("请查看网络后 重试\n")
-		fmt.Printf("耗时 %v\n",stop)
-		ctx.Done()
-
-	} else {
-		fmt.Printf("git  clone  success:%v\n",string(out01))
-		fmt.Printf("git  clone success:%v\n",err01)
-		stop:=time.Since(start)
-		fmt.Printf("耗时 %v\n",stop)
-		ctx.Done()
+	select {
+	case <-ctx.Done():
+		fmt.Printf("命令获取超时")
+	default:
+		out01,err01:=c2.CombinedOutput()
+		if err01 != nil {
+			fmt.Printf("git  clone err:%v\n",err01)
+			fmt.Printf("git clone  err:%v\n",string(out01))
+			stop:=time.Since(start)
+			fmt.Printf("请查看网络后 重试\n")
+			fmt.Printf("耗时 %v\n",stop)
+			ctx.Done()
+			ctxerr0:=ctx.Err()
+			fmt.Println(ctxerr0)
+			return
+		} else {
+			fmt.Printf("git  clone  success:%v\n",string(out01))
+			fmt.Printf("git  clone success:%v\n",err01)
+			stop:=time.Since(start)
+			fmt.Printf("耗时 %v\n",stop)
+			ctx.Done()
+			ctx.Err()
+		}
 	}
-
-
-
 }
+
+
+//func  GitClone

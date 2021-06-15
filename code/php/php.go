@@ -136,36 +136,15 @@ func (p *Php) Install(){
 	} else {
 		fmt.Printf("赋予权限成功 err:%v\n",errchmod)
 	}
-	//把php-fpm添加到系统命令
-	c11:=exec.Command("chkconfig","--add","/etc/init.d/php-fpm")
-	out11,err11:=c11.CombinedOutput()
-	if err11 != nil {
-		fmt.Printf("添加系统命令  命令 err :%v\n",err11)
-		fmt.Printf("添加系统命令   命令 err :%v\n",string(out11))
-		return
-	} else {
-		fmt.Printf("添加系统命令  命令 success :%v\n",string(out11))
-		c12:=exec.Command("find","/","-name","php")
-		out12,_:=c12.CombinedOutput()
-		fmt.Printf("Php dir:\n%v\n",string(out12))
-	}
+	c12:=exec.Command("find","/","-name","php")
+	out12,_:=c12.CombinedOutput()
+	fmt.Printf("Php dir:\n%v\n",string(out12))
 	c4:=exec.Command("cp",workdir+"/index.php","/usr/share/nginx/html/")
 	out04,_:=c4.CombinedOutput()
 	fmt.Printf("cp Index.PHP :%v\n",string(out04))
-/*	//create user php
-	c10:=exec.Command("useradd","-M","-s","/sbin/nologin","php")
-	out10,err10:=c10.CombinedOutput()
-	if err10 != nil {
-		fmt.Printf("create user Php err :%v\n",err10)
-		fmt.Printf("create user Php  err :%v\n",string(out10))
-		return
-	} else {
-		fmt.Printf("create user Php  :%v\n",string(out10))
-	}*/
-
 }
 func (p *Php) Start(){
-	cmd:=exec.Command("systemctl","start","php-fpm")
+	cmd:=exec.Command("/etc/rc.d/init.d/php-fpm","start")
 	out,err:=cmd.CombinedOutput()
 	if err !=nil{
 		fmt.Printf("Php 启动失败 :%v\n",err)
@@ -183,7 +162,7 @@ func (p *Php) Start(){
 	}
 }
 func (p *Php) Stop(){
-	c1:=exec.Command("systemctl","stop","php-fpm")
+	c1:=exec.Command("/etc/rc.d/init.d/php-fpm","stop")
 	out,err:=c1.CombinedOutput()
 	if err !=nil{
 		fmt.Printf("Php 停止失败 :%v\n",err)
