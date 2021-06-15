@@ -1,0 +1,15 @@
+#! /bin/sh
+#
+# Created by configure
+
+'./configure' \
+'--prefix=/usr/local/php' \
+'--with-gd' \
+'--with-zlib' \
+'--with-mysql=mysqlnd' \
+'--with-mysqli=mysqlnd' \
+'--with-config-file-path=/usr/local/php' \
+'--enable-fpm' \
+'--enable-mbstring' \
+'--with-jpeg-dir=/usr/lib' \
+"$@"
