@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-tools/Mysql"
 	"go-tools/directory"
+	"go-tools/help"
 	"go-tools/nginx"
 	"go-tools/php"
 	"os/user"
@@ -12,7 +13,8 @@ import (
 
 
 func main() {
-	ngxflag:=flag.String("ngx","","nginx")  //配置nginx选项的默认参数
+	helpflag:=flag.String("help","not","帮助参数")
+	ngxflag:=flag.String("web","","nginx")  //配置nginx选项的默认参数
 	dir:=flag.String("dir","","workdir")//配置dir选项的默认参数
 	dbflag:=flag.String("db","","mysql") //配置db选项的默认参数
 	phpflag:=flag.String("php","","php") //配置php选项的默认参数
@@ -26,10 +28,17 @@ func main() {
 	var  ppp php.Phproom
 	phpinit:=&php.Php{}
 	ppp=phpinit
+	//帮助区域
+	if *helpflag=="" {
+		help.OutPut()  //输出帮助内容
+	}
+	//初始化区域
 	if *dir=="create" {
 		directory.CreateDir()
 	}
-	switch *ngxflag {
+
+	//Nginx  区域
+	switch *ngxflag {  //使用switch 进行多条件判断
 	case "install":
 		web.Check()
 		web.Install()
@@ -44,11 +53,14 @@ func main() {
 		web.Deploy()
 		ppp.Stop()
 		ppp.Start()
+	case "help":
+		help.OutPut()  //输出帮助内容
 	}
+	//MySQL 区域
 	var  db  Mysql.Mysqlroom
 	dbinit:=&Mysql.Mysql{}
 	db=dbinit //给接口赋值
-	switch *dbflag{
+	switch *dbflag{   //使用switch 进行多条件判断
 	case "install":
 		db.Check()
 		db.Install()
@@ -59,10 +71,12 @@ func main() {
 	case "remove":
 		db.Stop()
 		db.Remove()
+	case "help":
+		help.OutPut()  //输出帮助内容
 	}
 
-
-	switch *phpflag{
+    //PHP区域
+	switch *phpflag{ //使用switch 进行多条件判断
 	case "install":
 		ppp.Check()
 		ppp.Install()
@@ -72,5 +86,7 @@ func main() {
 		ppp.Stop()
 	case "remove":
 		ppp.Remove()
+	case "help":
+		help.OutPut()  //输出帮助内容
 	}
 }

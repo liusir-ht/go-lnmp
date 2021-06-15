@@ -20,11 +20,11 @@
 ## 选项参数说明
  选项名称     |  参数名称 |  
  ---     |  --- |
- web   | start,stop,install,remove,deploy
- db    | start,stop,install,remove
- php   | start,stop,install,remove
+ web   | start,stop,install,remove,deploy,help
+ db    | start,stop,install,remove,help
+ php   | start,stop,install,remove,help
  dir   | create 
- 
+ help  | " "
  
   `start` 参数用于启动各个服务
   
@@ -37,7 +37,8 @@
   `deploy` 参数用于nginx 安装好之后,修改配置文件使用
   
   `create` 参数用于第一次初始化目录以及包文件使用
- 
+  
+  `help`   参数用于显示命令帮助信息
   
 ## Example
 
@@ -53,7 +54,7 @@
   
   
 ```
-./main  --web  start/stop/install/remove/deploy
+./main  --web  start/stop/install/remove/deploy/help
 ```
 
 
@@ -61,12 +62,20 @@
   
   
 ```
-./main  --db  start/stop/install/remove
+./main  --db  start/stop/install/remove/help
 ```
 
 ####  Php
   
   
 ```
-./main  --php  start/stop/install/remove
+./main  --php  start/stop/install/remove/help
+```
+
+####  Help
+```
+./main  --help   
+显示简单帮助信息
+./main  --help   ""
+显示详细帮助信息
 ```

@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 )
 
 var (
 	Workdir       ="/home/github.com"                         //dir目录
 	GithubAddress ="https://github.com.cnpmjs.org/liusir-ht/go-lnmp.git" //仓库地址
+      wg sync.WaitGroup
 )
-
 func CreateDir(){
 	_,err:=os.Stat(Workdir)  //检查目录info
 	if err !=nil{
@@ -55,37 +56,37 @@ func DownLoadPkg()  {
 		c4.Dir=Workdir
 		_=c4.Run()
 	}
-	start:=time.Now()
-	fmt.Printf("开始时间 ： %v\n",start)
-	ctx,cancel:=context.WithDeadline(context.Background(),start.Add(time.Minute*5) )   //定一个 context超时控制
-	defer cancel()
-	c2:=exec.CommandContext(ctx,"git","clone", GithubAddress) //克隆 GitHub 到本地
-	c2.Dir=Workdir
-	select {
-	case <-ctx.Done():
-		fmt.Printf("命令获取超时")
-	default:
+	ctx,cancel:=context.WithTimeout(context.Background(),time.Minute*5 )   //定一个 context超时控制
+	wg.Add(1)  //设置goroutine的个数 1
+	go GitClone(ctx)  //把这个带有超时的 context传入进去
+	wg.Wait()  //阻塞等待 goroutine 执行结束
+	select { //select 多路复用
+		case <-ctx.Done(): //等待上级信号,一旦从这个channel获取到内容 就 输出命令超时，否则一直堵塞
+			fmt.Println("命令超时")
+			cancel()
+			return
+		default:
+		}
+}
+func  GitClone(ctx context.Context){    //定义一个GitClone函数
+	   start:=time.Now()  //定义程序开始时间
+	   fmt.Printf("开始时间 ： %v\n",start)
+		c2:=exec.CommandContext(ctx,"git","clone", GithubAddress) //克隆 GitHub 到本地
+		c2.Dir=Workdir //指定工作目录
 		out01,err01:=c2.CombinedOutput()
 		if err01 != nil {
-			fmt.Printf("git  clone err:%v\n",err01)
 			fmt.Printf("git clone  err:%v\n",string(out01))
-			stop:=time.Since(start)
 			fmt.Printf("请查看网络后 重试\n")
+			stop:=time.Since(start) //计算程序运行的时间
 			fmt.Printf("耗时 %v\n",stop)
-			ctx.Done()
-			ctxerr0:=ctx.Err()
-			fmt.Println(ctxerr0)
+			_=os.RemoveAll(Workdir)
+			ctx.Done()  //发送 ctx.Done 信号 给 上级
 			return
 		} else {
 			fmt.Printf("git  clone  success:%v\n",string(out01))
-			fmt.Printf("git  clone success:%v\n",err01)
-			stop:=time.Since(start)
+			stop:=time.Since(start)  //计算程序运行的时间
 			fmt.Printf("耗时 %v\n",stop)
-			ctx.Done()
-			ctx.Err()
+			ctx.Done()  //发送 ctx.Done 信号 给 上级
 		}
-	}
+		wg.Done()  //让设置 goroutine的个数  -1
 }
-
-
-//func  GitClone
