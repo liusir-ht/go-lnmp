@@ -20,10 +20,12 @@
 ## 选项参数说明
  选项名称     |  参数名称 |  
  ---     |  --- |
- ngx   | start,stop,install,remove,deploy
+ web   | start,stop,install,remove,deploy
  db    | start,stop,install,remove
  php   | start,stop,install,remove
  dir   | create 
+ 
+ 
   `start` 参数用于启动各个服务
   
   `stop`  参数用于停止各个服务 
@@ -51,7 +53,7 @@
   
   
 ```
-./main  --ngx  start/stop/install/remove/deploy
+./main  --web  start/stop/install/remove/deploy
 ```
 
 
