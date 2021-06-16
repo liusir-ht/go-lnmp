@@ -24,7 +24,6 @@ type Phproom interface {   //定义Php接口
 	Remove()
 }
 type Php struct {
-
 }
 func (p *Php) Check()  {
 	cmd:=exec.Command("yum","install","-y","libxml2-devel","libxml2",

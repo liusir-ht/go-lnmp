@@ -12,7 +12,7 @@ import (
 var (
 	Workdir       ="/home/github.com"                         //dir目录
 	GithubAddress ="https://github.com.cnpmjs.org/liusir-ht/go-lnmp.git" //仓库地址
-      wg sync.WaitGroup
+	wg sync.WaitGroup
 )
 func CreateDir(){
 	_,err:=os.Stat(Workdir)  //检查目录info
@@ -23,7 +23,7 @@ func CreateDir(){
 				fmt.Println("创建目录失败\n",err)
 				return
 			}else {
-				fmt.Println("创建GitHub目录成功\n","开始DownLoadpkg......")
+				fmt.Println("创建GitHub目录成功","开始DownLoadpkg......")
 				DownLoadPkg()  //下载GitHub 所需要的包
 			}
 		}
@@ -62,11 +62,12 @@ func DownLoadPkg()  {
 	wg.Wait()  //阻塞等待 goroutine 执行结束
 	select { //select 多路复用
 		case <-ctx.Done(): //等待上级信号,一旦从这个channel获取到内容 就 输出命令超时，否则一直堵塞
-			fmt.Println("命令超时")
-			cancel()
+			fmt.Println("执行命令超时")
+			defer cancel()
 			return
 		default:
 		}
+	defer cancel()
 }
 func  GitClone(ctx context.Context){    //定义一个GitClone函数
 	   start:=time.Now()  //定义程序开始时间
@@ -79,7 +80,7 @@ func  GitClone(ctx context.Context){    //定义一个GitClone函数
 			fmt.Printf("请查看网络后 重试\n")
 			stop:=time.Since(start) //计算程序运行的时间
 			fmt.Printf("耗时 %v\n",stop)
-			_=os.RemoveAll(Workdir)
+			_=os.RemoveAll(Workdir)  //如果克隆失败，就删除原来的目录
 			ctx.Done()  //发送 ctx.Done 信号 给 上级
 			return
 		} else {

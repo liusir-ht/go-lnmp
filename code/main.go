@@ -13,11 +13,13 @@ import (
 
 
 func main() {
-	helpflag:=flag.String("help","not","帮助参数")
+	versionflag:=flag.String("version","","软件版本")
+	//helpflag:=flag.String("help","not","帮助参数")
 	ngxflag:=flag.String("web","","nginx")  //配置nginx选项的默认参数
 	dir:=flag.String("dir","","workdir")//配置dir选项的默认参数
 	dbflag:=flag.String("db","","mysql") //配置db选项的默认参数
 	phpflag:=flag.String("php","","php") //配置php选项的默认参数
+
 	flag.Parse() //解析参数
 	//用户模块
 	u,_:=user.Current()
@@ -28,10 +30,30 @@ func main() {
 	var  ppp php.Phproom
 	phpinit:=&php.Php{}
 	ppp=phpinit
-	//帮助区域
-	if *helpflag=="" {
-		help.OutPut()  //输出帮助内容
+	//版本区域
+	switch {
+	case *versionflag=="1.20" && *ngxflag != "":
+		nginx.Ngxrpm="nginx-1.20.0-1.el7.ngx.x86_64"
+	case *versionflag=="1.18" && *ngxflag != "":
+		nginx.Ngxrpm="nginx-1.18.0-1.el7.ngx.x86_64"
+	case *versionflag=="1.16" && *ngxflag != "":
+		nginx.Ngxrpm="nginx-1.16.0-1.el7.ngx.x86_64"
+	case *versionflag=="5.6" && *dbflag != "":
+		Mysql.VersionChan <- *versionflag  //获取的的data 往channel发送
+		defer close(Mysql.VersionChan)  //关闭channel
+	case *versionflag=="5.7" && *dbflag != "":
+		Mysql.VersionChan <- *versionflag
+		defer close(Mysql.VersionChan)
+	case *versionflag=="help":
+		help.OutPut()
+	case *versionflag=="":
+		fmt.Println("请输入软件版本")
+		return
 	}
+	//帮助区域
+	/*if *helpflag=="" {
+		help.OutPut()  //输出帮助内容
+	}*/
 	//初始化区域
 	if *dir=="create" {
 		directory.CreateDir()
@@ -69,7 +91,6 @@ func main() {
 	case "stop":
 		db.Stop()
 	case "remove":
-		db.Stop()
 		db.Remove()
 	case "help":
 		help.OutPut()  //输出帮助内容
