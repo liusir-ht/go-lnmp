@@ -32,31 +32,25 @@ func main() {
 	ppp=phpinit
 	//版本区域
 	switch {
-	case *versionflag=="1.20" && *ngxflag != "":
+	case *versionflag=="1.20" && *ngxflag != "":   //根据参数 判断nginx的版本
 		nginx.Ngxrpm="nginx-1.20.0-1.el7.ngx.x86_64"
-	case *versionflag=="1.18" && *ngxflag != "":
+	case *versionflag=="1.18" && *ngxflag != "":  //根据参数 判断nginx的版本
 		nginx.Ngxrpm="nginx-1.18.0-1.el7.ngx.x86_64"
-	case *versionflag=="1.16" && *ngxflag != "":
+	case *versionflag=="1.16" && *ngxflag != "":   //根据参数 判断nginx的版本
 		nginx.Ngxrpm="nginx-1.16.0-1.el7.ngx.x86_64"
-	case *versionflag=="5.6" && *dbflag != "":
+	case *versionflag=="5.6" && *dbflag != "":   //根据参数 判断mysql的版本
 		Mysql.VersionChan <- *versionflag  //获取的的data 往channel发送
 		defer close(Mysql.VersionChan)  //关闭channel
-	case *versionflag=="5.7" && *dbflag != "":
+	case *versionflag=="5.7" && *dbflag != "": //根据参数 判断mysql的版本
 		Mysql.VersionChan <- *versionflag
 		defer close(Mysql.VersionChan)
-	case *versionflag=="help":
+	case *versionflag=="help":   //当参数为 help时 输出帮助信息
 		help.OutPut()
-	case *versionflag=="":
+	case *versionflag=="" && *dir=="create":    //判断当 第一次初始化的时候
+		directory.CreateDir()   //初始化函数
+	case *versionflag=="":   //当没有指定版本
 		fmt.Println("请输入软件版本")
 		return
-	}
-	//帮助区域
-	/*if *helpflag=="" {
-		help.OutPut()  //输出帮助内容
-	}*/
-	//初始化区域
-	if *dir=="create" {
-		directory.CreateDir()
 	}
 
 	//Nginx  区域

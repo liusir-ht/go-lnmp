@@ -13,6 +13,7 @@ var (
 	Workdir       ="/home/github.com"                         //dir目录
 	GithubAddress ="https://github.com.cnpmjs.org/liusir-ht/go-lnmp.git" //仓库地址
 	wg sync.WaitGroup
+	GitlfsAddress="https://github.com/git-lfs/git-lfs/releases/download/v2.13.3/git-lfs-linux-amd64-v2.13.3.tar.gz"
 )
 func CreateDir(){
 	_,err:=os.Stat(Workdir)  //检查目录info
@@ -55,6 +56,29 @@ func DownLoadPkg()  {
 		c4:=exec.Command("git ","config"," --global"," http.postBuffer 100M")
 		c4.Dir=Workdir
 		_=c4.Run()
+		c5:=exec.Command("wget",GitlfsAddress)  //下载 Gitlfs
+		c5.Dir="/home"  // 指定工作目录
+		c6:=exec.Command("tar","-zxf","git-lfs-linux-amd64-v2.13.3.tar.gz")
+		c7:=exec.Command("/home/git-lfs","install") //安装Gitlfs
+		c6.Dir=c5.Dir
+		out05,err05:=c5.CombinedOutput()
+		if err05!=nil {
+			fmt.Printf("获取git-lfs err:%v\n",string(out05))
+			fmt.Printf("获取git-lfs err:%v\n",err05)
+			return
+		}else {
+			fmt.Println("获取git-lfs  success")
+		}
+		time.Sleep(time.Second *3)
+		_=c6.Run()
+		out07,err07:=c7.CombinedOutput()
+		if err07!=nil {
+			fmt.Printf("安装git-lfs err:%v\n",string(out07))
+			fmt.Printf("安装git-lfs err:%v\n",err07)
+			return
+		}else {
+			fmt.Println("安装git-lfs  success")
+		}
 	}
 	ctx,cancel:=context.WithTimeout(context.Background(),time.Minute*5 )   //定一个 context超时控制
 	wg.Add(1)  //设置goroutine的个数 1
@@ -63,7 +87,7 @@ func DownLoadPkg()  {
 	select { //select 多路复用
 		case <-ctx.Done(): //等待上级信号,一旦从这个channel获取到内容 就 输出命令超时，否则一直堵塞
 			fmt.Println("执行命令超时")
-			defer cancel()
+			defer cancel()  //执行cancel函数
 			return
 		default:
 		}

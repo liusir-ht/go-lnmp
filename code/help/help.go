@@ -2,7 +2,7 @@ package help
 
 import "fmt"
 
-func OutPut(){
+func OutPut(){   //定义一个函数 输出帮助信息 内容
 	fmt.Println(`
 Option:
   --web	start,stop,install,remove,deploy
@@ -22,6 +22,8 @@ Parameter:
   deploy 用于nginx 安装好之后,修改配置文件使用
 
   create 用于第一次初始化目录以及包文件使用
+
+  help   显示帮助信息
 
 Example:
   ./main  Option  Parameter`)
