@@ -26,7 +26,7 @@
  dir   | create 
  version | nginx:1.16/1.18/1.20 mysql:5.6/5.7
 
-###选项
+### 选项
 
   `web`   Nginx operation
   
