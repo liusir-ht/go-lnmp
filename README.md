@@ -6,9 +6,9 @@
 ## 正式开始
 >环境介绍：
 
-> Nginx 1.20.X
+> Nginx 1.16/1.18/1.20
 
-> MySQL 5.6.X
+> MySQL 5.6/5.7
 
 > Php   5.5.X
 
@@ -24,8 +24,22 @@
  db    | start,stop,install,remove,help
  php   | start,stop,install,remove,help
  dir   | create 
- help  | " "
- 
+ version | nginx:1.16/1.18/1.20 mysql:5.6/5.7
+
+###选项
+
+  `web`   Nginx operation
+  
+  `db`    MySQL operation
+  
+  `dir`   First init,directory/pkg
+  
+  `php`   Php operation
+  
+  `version` 指定软件的version
+  
+###  参数 
+
   `start` 参数用于启动各个服务
   
   `stop`  参数用于停止各个服务 
@@ -39,6 +53,9 @@
   `create` 参数用于第一次初始化目录以及包文件使用
   
   `help`   参数用于显示命令帮助信息
+  
+  
+  
   
 ## Example
 
@@ -72,10 +89,8 @@
 ./main  --php  start/stop/install/remove/help
 ```
 
-####  Help
+#### Version
+需要注意的是 软件操作的时候必须指定 **版本号**
 ```
-./main  --help   
-显示简单帮助信息
-./main  --help   ""
-显示详细帮助信息
+./main  --version  1.16  --web   install 
 ```

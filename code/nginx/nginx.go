@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ngxrpm  = "nginx-1.20.0-1.el7.ngx.x86_64"  //定义安装Nginx的包名
+	Ngxrpm string  //定义安装Nginx的包名*/
 	workdir ="/home/github.com/go-lnmp/nginx"  //Nginx的包的目录
 	ngxconf ="/etc/nginx/conf.d/default.conf"
 )
@@ -48,7 +48,7 @@ func (n *Ngx)  Check(){
 
 // Install 安装nginx
 func (n *Ngx) Install(){
-	cmd:=exec.Command("yum","localinstall","-y",ngxrpm+".rpm")  //安装nginx Rpm包
+	cmd:=exec.Command("yum","localinstall","-y",Ngxrpm+".rpm")  //安装nginx Rpm包
 	cmd.Dir=workdir  //指定包的目录
 	d1,err:=cmd.CombinedOutput()
 	if err !=nil{
@@ -74,7 +74,6 @@ func (n *Ngx) Install(){
 			}else {
 				fmt.Printf("Chmod dir /usr/share/nginx/html  success:%v\n", err02)
 			}
-
 		}
 	}
 }
@@ -120,7 +119,7 @@ func (n *Ngx) Stop(){
 
 // Remove 删除nginx
 func (n *Ngx) Remove(){
-	cmd:=exec.Command("yum","remove","-y",ngxrpm)
+	cmd:=exec.Command("yum","remove","-y",Ngxrpm)
 	d1,err:=cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Nginx 删除失败 %v\n",string(d1))
