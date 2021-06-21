@@ -8,7 +8,8 @@ import (
 
 var (
 	Ngxrpm string  //定义安装Nginx的包名*/
-	workdir ="/home/github.com/go-lnmp/nginx"  //Nginx的包的目录
+	workdir ="/home/github.com/go-lnmp/pkg/nginx"  //Nginx的包的目录
+	confdir="/home/github.com/go-lnmp/conf"
 	ngxconf ="/etc/nginx/conf.d/default.conf"
 )
 
@@ -139,7 +140,7 @@ func (n *Ngx) Deploy(){
 	}else {
 		fmt.Printf("删除 nginx conf 成功\n")
 	}
-	cmd:=exec.Command("cp","-rp",workdir+"/default.conf","/etc/nginx/conf.d/")
+	cmd:=exec.Command("cp","-rp",confdir+"/default.conf","/etc/nginx/conf.d/")
 	out02,err02:=cmd.CombinedOutput()
 	if err02 != nil {
 		fmt.Printf("copy  ngxconf  err:%v\n",err02)

@@ -6,14 +6,14 @@ import (
 	"os/exec"
 )
 
-const (
-	Phppackage7 = "php-7.2.33"
-	Phppackage5= "php-5.5.38"
-)
+
+
+
 var (
-	workdir ="/home/github.com/go-lnmp/php"  //Php的包的目录
-	compiledir7 =workdir+"/php-7.2.33"  //Php编译的目录
-	compiledir5 =workdir+"/php-5.5.38"  //Php编译的目录
+	Phppackage string
+	Workdir ="/home/github.com/go-lnmp/pkg/php"  //Php的包的目录
+	confdir ="/home/github.com/go-lnmp/conf"
+	Compiledir string  //Php编译的目录
 	installdir="/usr/local/php"
 )
 type Phproom interface {   //定义Php接口
@@ -39,8 +39,8 @@ func (p *Php) Check()  {
 }
 func (p *Php) Install(){
 	//解压
-	cmd:=exec.Command("tar","-zxf",Phppackage5+".tar.gz")
-	cmd.Dir=workdir
+	cmd:=exec.Command("tar","-zxf",Phppackage+".tar.gz")
+	cmd.Dir=Workdir
 	out,err:=cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Php tar err:%v\n",err)
@@ -50,8 +50,8 @@ func (p *Php) Install(){
 		fmt.Printf("Php tar success:%v\n",string(out))
 	}
 	//切换目录
-	c2:=exec.Command("cd",Phppackage5)
-	c2.Dir=workdir
+	c2:=exec.Command("cd",Phppackage)
+	c2.Dir=Workdir
 	err02:=c2.Run()
 	if err02 != nil {
 		fmt.Printf("cd  err:%v\n",err02)
@@ -62,7 +62,7 @@ func (p *Php) Install(){
 		"--with-gd","--with-zlib","--with-mysql=mysqlnd",
 		"--with-mysqli=mysqlnd", "--with-config-file-path=/usr/local/php",
 		 "--enable-fpm" , "--enable-mbstring","--with-jpeg-dir=/usr/lib")
-	c3.Dir=compiledir5
+	c3.Dir=Compiledir
 	fmt.Printf("当前工作目录：%v\n 请耐心等待.......\n目录编译开始：... \n",c3.Dir)
 	out03,err03:=c3.CombinedOutput()
 	if err03 != nil {
@@ -72,7 +72,7 @@ func (p *Php) Install(){
 	}else {
 		fmt.Printf("compile PHP  success :%v\n",string(out03))
 		c4:=exec.Command("make")
-		c4.Dir=compiledir5
+		c4.Dir=Compiledir
 		fmt.Printf("当前工作目录：%v\n 请耐心等待.......\nmake 开始\n",c4.Dir)
 		out04,err04:=c4.CombinedOutput()
 		if err04 != nil {
@@ -87,7 +87,7 @@ func (p *Php) Install(){
 	}
 	//make install
 	c5:=exec.Command("make","install")
-	c5.Dir=compiledir5
+	c5.Dir=Compiledir
 	fmt.Printf("当前工作目录：%v\n 请耐心等待.......\nmake install 开始\n",c5.Dir)
 	out05,err05:=c5.CombinedOutput()
 	if err05 != nil {
@@ -98,7 +98,7 @@ func (p *Php) Install(){
 		fmt.Printf("make  install PHP  success:%v\n",string(out05))
 	}
 	//copy ini
-	c8:=exec.Command("cp",workdir+"/"+"php.ini","/usr/local/php/php.ini")
+	c8:=exec.Command("cp",confdir+"/"+"php.ini","/usr/local/php/php.ini")
 	out08,err08:=c8.CombinedOutput()
 	if err08 != nil {
 		fmt.Printf("copy php.ini err :%v\n",err08)
@@ -108,7 +108,7 @@ func (p *Php) Install(){
 		fmt.Printf("copy php.ini success :%v\n",string(out08))
 	}
 	//copy php-fpm.conf
-	c9:=exec.Command("cp",workdir+"/"+"php-fpm.conf","/usr/local/php/etc/")
+	c9:=exec.Command("cp",confdir+"/"+"php-fpm.conf","/usr/local/php/etc/")
 	out09,err09:=c9.CombinedOutput()
 	if err09 != nil {
 		fmt.Printf("copy php-fpm.conf err :%v\n",err09)
@@ -118,7 +118,7 @@ func (p *Php) Install(){
 		fmt.Printf("copy php-fpm.conf success :%v\n",string(out09))
 	}
 	//copy php-fpm 命令
-	c10:=exec.Command("cp","-f",workdir+"/php-5.5.38/sapi/fpm/init.d.php-fpm",
+	c10:=exec.Command("cp","-f",Workdir+"/",Phppackage,"/sapi/fpm/init.d.php-fpm",
 		"/etc/rc.d/init.d/php-fpm")
 	out10,err10:=c10.CombinedOutput()
 	if err10 != nil {
@@ -138,7 +138,7 @@ func (p *Php) Install(){
 	c12:=exec.Command("find","/","-name","php")
 	out12,_:=c12.CombinedOutput()
 	fmt.Printf("Php dir:\n%v\n",string(out12))
-	c4:=exec.Command("cp",workdir+"/index.php","/usr/share/nginx/html/")
+	c4:=exec.Command("cp",confdir+"/index.php","/usr/share/nginx/html/")
 	out04,_:=c4.CombinedOutput()
 	fmt.Printf("cp Index.PHP :%v\n",string(out04))
 }

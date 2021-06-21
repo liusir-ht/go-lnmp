@@ -13,12 +13,14 @@ var (
 	Workdir       ="/home/github.com"                         //dir目录
 	GithubAddress ="https://github.com.cnpmjs.org/liusir-ht/go-lnmp.git" //仓库地址
 	wg sync.WaitGroup
-	GitlfsAddress="https://github.com/git-lfs/git-lfs/releases/download/v2.13.3/git-lfs-linux-amd64-v2.13.3.tar.gz"
+	//GitlfsAddress="https://github.com/git-lfs/git-lfs/releases/download/v2.13.3/git-lfs-linux-amd64-v2.13.3.tar.gz"
+	GitlfsDir = "/home/lfs/"
 )
 func CreateDir(){
 	_,err:=os.Stat(Workdir)  //检查目录info
 	if err !=nil{
 		if  os.IsNotExist(err) {   //判断文件或者目录是否存在
+			_=os.Mkdir(GitlfsDir,os.ModePerm)
 			err=os.MkdirAll(Workdir,os.ModePerm)  //如果不存在 创建目录
 			if err != nil {
 				fmt.Println("创建目录失败\n",err)
@@ -29,7 +31,7 @@ func CreateDir(){
 			}
 		}
 	}else {
-		fmt.Println("GitHub目录已存在\n"," 开始DownLoadpkg......")
+		fmt.Println("GitHub目录已存在"," 开始DownLoadpkg......")
 		DownLoadPkg()  //下载GitHub 所需要的包
 	}
 }
@@ -56,10 +58,10 @@ func DownLoadPkg()  {
 		c4:=exec.Command("git ","config"," --global"," http.postBuffer 100M")
 		c4.Dir=Workdir
 		_=c4.Run()
-		c5:=exec.Command("wget",GitlfsAddress)  //下载 Gitlfs
-		c5.Dir="/home"  // 指定工作目录
+		/*c5:=exec.Command("wget",GitlfsAddress)  //下载 Gitlfs
+		c5.Dir=GitlfsDir  // 指定工作目录
 		c6:=exec.Command("tar","-zxf","git-lfs-linux-amd64-v2.13.3.tar.gz")
-		c7:=exec.Command("/home/git-lfs","install") //安装Gitlfs
+		c7:=exec.Command(GitlfsDir+"git-lfs","install") //安装Gitlfs
 		c6.Dir=c5.Dir
 		out05,err05:=c5.CombinedOutput()
 		if err05!=nil {
@@ -69,7 +71,6 @@ func DownLoadPkg()  {
 		}else {
 			fmt.Println("获取git-lfs  success")
 		}
-		time.Sleep(time.Second *3)
 		_=c6.Run()
 		out07,err07:=c7.CombinedOutput()
 		if err07!=nil {
@@ -78,9 +79,9 @@ func DownLoadPkg()  {
 			return
 		}else {
 			fmt.Println("安装git-lfs  success")
-		}
+		}*/
 	}
-	ctx,cancel:=context.WithTimeout(context.Background(),time.Minute*5 )   //定一个 context超时控制
+	ctx,cancel:=context.WithTimeout(context.Background(),time.Minute * 10 )   //定一个 context超时控制
 	wg.Add(1)  //设置goroutine的个数 1
 	go GitClone(ctx)  //把这个带有超时的 context传入进去
 	wg.Wait()  //阻塞等待 goroutine 执行结束
@@ -93,25 +94,43 @@ func DownLoadPkg()  {
 		}
 	defer cancel()
 }
-func  GitClone(ctx context.Context){    //定义一个GitClone函数
+func  GitClone(ctx context.Context) <-chan struct{}{    //定义一个GitClone函数
 	   start:=time.Now()  //定义程序开始时间
 	   fmt.Printf("开始时间 ： %v\n",start)
-		c2:=exec.CommandContext(ctx,"git","clone", GithubAddress) //克隆 GitHub 到本地
-		c2.Dir=Workdir //指定工作目录
-		out01,err01:=c2.CombinedOutput()
-		if err01 != nil {
-			fmt.Printf("git clone  err:%v\n",string(out01))
+	   c2:=exec.CommandContext(ctx,"git","clone", GithubAddress) //克隆 GitHub 到本地
+	   c2.Dir=Workdir //指定工作目录
+	   /*out01,err01:=c2.CombinedOutput()*/
+	   err01:=c2.Run()
+	   if err01 != nil {
+			fmt.Printf("git clone  err:%v\n",err01)
 			fmt.Printf("请查看网络后 重试\n")
 			stop:=time.Since(start) //计算程序运行的时间
 			fmt.Printf("耗时 %v\n",stop)
 			_=os.RemoveAll(Workdir)  //如果克隆失败，就删除原来的目录
-			ctx.Done()  //发送 ctx.Done 信号 给 上级
-			return
+			wg.Done()  //让设置 goroutine的个数  -1
+			return  ctx.Done()  //发送 ctx.Done 信号 给 上级
 		} else {
-			fmt.Printf("git  clone  success:%v\n",string(out01))
-			stop:=time.Since(start)  //计算程序运行的时间
+			fmt.Println("git  clone  success")
+			//下载Mysql server Pkg
+			c3:=exec.Command("wget","https://downloads.mysql.com/archives/get/p/23/file/mysql-community-server-5.7.33-1.el7.x86_64.rpm")
+		    c3.Dir="/home/github.com/go-lnmp/pkg/mysql"
+		    err03:=c3.Run()
+		    if err03 !=nil{
+		    	fmt.Printf("获取mysql SERVER ERR:%v\n",err03)
+			}
+		    stop:=time.Since(start)  //计算程序运行的时间
 			fmt.Printf("耗时 %v\n",stop)
-			ctx.Done()  //发送 ctx.Done 信号 给 上级
+			wg.Done()  //让设置 goroutine的个数  -1
+			return  ctx.Done()  //发送 ctx.Done 信号 给 上级
 		}
-		wg.Done()  //让设置 goroutine的个数  -1
+}
+func DelDir(){
+	err:=os.RemoveAll(Workdir)  //删除工作目录
+	_=os.RemoveAll(GitlfsDir)   //删除Gitlfs 工作目录
+	if err != nil {
+		fmt.Printf("Workdir delete err:%v\n",err)
+		return
+	}else {
+		fmt.Println("Workdir delete success")
+	}
 }

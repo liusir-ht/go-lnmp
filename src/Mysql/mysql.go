@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	workdir     ="/home/github.com/go-lnmp/mysql" //MySQL的包的目录
+	workdir     ="/home/github.com/go-lnmp/pkg/mysql" //MySQL的包的目录
 	Mysqlrpmc  = "MySQL-client-5.6.40-1.el7.x86_64"                            //mysql-client的包名称
 	Mysqlrpms  ="MySQL-server-5.6.40-1.el7.x86_64"                           //mysql-server的包名称
     VersionChan =make(chan string,100)                   //传输MySQL 版本的channel
@@ -84,11 +84,11 @@ func (m *Mysql)  Check(){
 func (m *Mysql) Install() {
 	version := <-VersionChan //接收channel data
 	switch version {         //判断channel data
-	case "5.6":
+	case "5.6.40":
 		cmd = exec.Command("rpm", "-ivh", "MySQL-*"+".rpm") //安装 rpm包
 		cc4 = exec.Command("cat", "/root/.mysql_secret")  //查看临时密码
 		cc5=exec.Command("systemctl","start","mysql")
-	case "5.7":
+	case "5.7.33":
 		cmd = exec.Command("rpm", "-ivh", "mysql-community-*"+".rpm")  //安装 rpm包
 		cc3= exec.Command("systemctl","start","mysqld")  //查看临时密码
 		cc4 = exec.Command("cat", "/var/log/mysqld.log")
@@ -107,7 +107,7 @@ func (m *Mysql) Install() {
 		out03, _ := c3.CombinedOutput()
 		fmt.Printf("MySQL dir:\n%v\n", string(out03))
 		switch version {    //根据version数值的不同输出不同的结果
-		case "5.6":
+		case "5.6.40":
 			out,errcc4:=cc4.CombinedOutput()
 			if errcc4 !=nil {
 				fmt.Printf("MySQL Password Inital err：%v\n:", errcc4)
@@ -117,7 +117,7 @@ func (m *Mysql) Install() {
 				fmt.Printf("MySQL Password Inital success：%v\n:", string(out))
 				_=cc5.Run()
 			}
-		case "5.7":
+		case "5.7.33":
 			fmt.Println("MySQL Password Inital :")
 			_=cc3.Run()
 			_ = cc5.Start()
@@ -132,9 +132,9 @@ func (m *Mysql) Install() {
 func (m *Mysql) Start(){
 	version:=<- VersionChan   //接收channel data
 	switch version {
-	case "5.6":
+	case "5.6.40":
 		cmd = exec.Command("systemctl", "start", "mysql")
-	case "5.7":
+	case "5.7.33":
 		cmd = exec.Command("systemctl", "start", "mysqld")
 	}
 	d1,err:=cmd.CombinedOutput()
@@ -159,9 +159,9 @@ func (m *Mysql) Start(){
 func (m *Mysql) Stop() {
 	version:=<- VersionChan//接收channel data
 	switch version {
-	case "5.6":
+	case "5.6.40":
 		cmd = exec.Command("systemctl", "stop", "mysql")
-	case "5.7":
+	case "5.7.33":
 		cmd = exec.Command("systemctl", "stop", "mysqld")
 	}
 	d1, err := cmd.CombinedOutput()
@@ -177,7 +177,7 @@ func (m *Mysql) Stop() {
 func (m *Mysql) Remove(){
 	version:=<- VersionChan //接收channel data
 	switch version {  //判断channel的data
-	case "5.6":  //当 data = 5.6
+	case "5.6.40":  //当 data = 5.6
 		c1:=exec.Command("systemctl","stop","mysql")    //停止 mysql服务
 		cmd = exec.Command("rpm", "-e", Mysqlrpmc)  //删除mysql client  rpm包
 		c2:=exec.Command("rpm","-e",Mysqlrpms)   //删除 mysql server  rpm 包
@@ -189,8 +189,10 @@ func (m *Mysql) Remove(){
 		_=os.Remove("/root/.mysql_secret")
 
 
-	case "5.7": //当 data = 5.7
+	case "5.7.33": //当 data = 5.7
+	    c1:=exec.Command("systemctl","stop","mysqld") //停止 mysql服务
 		cmd = exec.Command("yum", "remove", "-y", "mysql-community-*")  //删除 mysql 5.7 的rpm包
+		_=c1.Run()
 		//删除残留目录和文件
 		removeerr:=os.RemoveAll("/var/lib/mysql")
 		if removeerr == nil {

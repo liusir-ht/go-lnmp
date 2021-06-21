@@ -14,7 +14,6 @@ import (
 
 func main() {
 	versionflag:=flag.String("version","","软件版本")
-	//helpflag:=flag.String("help","not","帮助参数")
 	ngxflag:=flag.String("web","","nginx")  //配置nginx选项的默认参数
 	dir:=flag.String("dir","","workdir")//配置dir选项的默认参数
 	dbflag:=flag.String("db","","mysql") //配置db选项的默认参数
@@ -38,16 +37,30 @@ func main() {
 		nginx.Ngxrpm="nginx-1.18.0-1.el7.ngx.x86_64"
 	case *versionflag=="1.16" && *ngxflag != "":   //根据参数 判断nginx的版本
 		nginx.Ngxrpm="nginx-1.16.0-1.el7.ngx.x86_64"
-	case *versionflag=="5.6" && *dbflag != "":   //根据参数 判断mysql的版本
+	case *versionflag=="1.14" && *ngxflag != "":   //根据参数 判断nginx的版本
+		nginx.Ngxrpm="nginx-1.14.2-1.el7_4.ngx.x86_64"
+	case *versionflag=="1.12" && *ngxflag != "":   //根据参数 判断nginx的版本
+		nginx.Ngxrpm="nginx-1.12.2-1.el7_4.ngx.x86_64"
+	case *versionflag=="1.10" && *ngxflag != "":   //根据参数 判断nginx的版本
+		nginx.Ngxrpm="nginx-1.10.1-1.el7.ngx.x86_64"
+	case *versionflag=="5.6.40" && *dbflag != "":   //根据参数 判断mysql的版本
 		Mysql.VersionChan <- *versionflag  //获取的的data 往channel发送
 		defer close(Mysql.VersionChan)  //关闭channel
-	case *versionflag=="5.7" && *dbflag != "": //根据参数 判断mysql的版本
+	case *versionflag=="5.7.33" && *dbflag != "": //根据参数 判断mysql的版本
 		Mysql.VersionChan <- *versionflag
 		defer close(Mysql.VersionChan)
+	case *versionflag=="5.5.38" && *phpflag != "":
+		 php.Phppackage="php-5.5.38"
+		 php.Compiledir=php.Workdir+"/5.5.38"
+	case *versionflag=="7.2.33"  && *phpflag !="":
+		 php.Phppackage="php-7.2.33"
+		php.Compiledir=php.Workdir+"/7.2.33"
 	case *versionflag=="help":   //当参数为 help时 输出帮助信息
 		help.OutPut()
 	case *versionflag=="" && *dir=="create":    //判断当 第一次初始化的时候
 		directory.CreateDir()   //初始化函数
+	case *versionflag=="" && *dir=="delete":    //判断当 第一次初始化的时候
+		directory.DelDir()  //删除工作目录
 	case *versionflag=="":   //当没有指定版本
 		fmt.Println("请输入软件版本")
 		return
