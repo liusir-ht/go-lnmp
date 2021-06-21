@@ -6,11 +6,11 @@
 ## 正式开始
 >环境介绍：
 
-> Nginx 1.16/1.18/1.20
+> Nginx 1.10/1.12/1.14/1.16/1.18/1.20
 
-> MySQL 5.6/5.7
+> MySQL 5.6.40/5.7.33
 
-> Php   5.5.X
+> Php   5.5.38/7.2.33
 
 > 使用到的目录： /home/github.com/
 
@@ -24,9 +24,9 @@
  db    | start,stop,install,remove,help
  php   | start,stop,install,remove,help
  dir   | create 
- version | nginx:1.16/1.18/1.20 mysql:5.6/5.7
+ version | nginx:1.16/1.18/1.20 mysql:5.6.40/5.7.33 php:5.5.38
 
-### 选项
+###选项
 
   `web`   Nginx operation
   
