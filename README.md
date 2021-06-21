@@ -23,8 +23,8 @@
  web   | start,stop,install,remove,deploy,help
  db    | start,stop,install,remove,help
  php   | start,stop,install,remove,help
- dir   | create 
- version | nginx:1.16/1.18/1.20 mysql:5.6.40/5.7.33 php:5.5.38
+ dir   | create,delete 
+ version | <p>nginx:1.10/1.12/1.14/1.16/1.18/1.20<br> mysql:5.6.40/5.7.33<br> php:5.5.38
 
 ###选项
 
